@@ -9,9 +9,10 @@ import com.google.common.collect.Maps;
 
 public class HttpRequestUtils {
     /**
-     * @param queryString은
-     *            URL에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
-     * @return
+     * 요청 url 로부터 쿼리스트링을 키, 밸류 값으로 파싱 후 맵으로 리턴
+     *
+     * @param queryString URL 에서 ? 이후에 전달되는 field1=value1&field2=value2 형식임
+     * @return 파싱된 키, 밸류 맵
      */
     public static Map<String, String> parseQueryString(String queryString) {
         return parseValues(queryString, "&");
