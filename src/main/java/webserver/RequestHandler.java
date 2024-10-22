@@ -45,7 +45,7 @@ public class RequestHandler extends Thread {
             while (!line.isEmpty()) {
                 log.debug("header: {}", line);
                 line = br.readLine();
-                if(line.contains("Content-Length")) {
+                if (line.contains("Content-Length")) {
                     contentLength = getContentLength(line);
                 }
             }
@@ -57,24 +57,32 @@ public class RequestHandler extends Thread {
                 Map<String, String> params = HttpRequestUtils.parseQueryString(body);
                 User user = new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
                 log.info("User : {}", user);
+                url = "/index.html";
                 DataOutputStream dos = new DataOutputStream(out);
-                byte[] responseBody = Files.readAllBytes(new File("./webapp/index.html").toPath());
-                response200Header(dos, responseBody.length);
-                responseBody(dos, responseBody);
-            } else {
-                DataOutputStream dos = new DataOutputStream(out);
-                byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
-                response200Header(dos, body.length);
-                responseBody(dos, body);
+                response302Header(dos, url);
             }
+            DataOutputStream dos = new DataOutputStream(out);
+            byte[] responseBody = Files.readAllBytes(new File("./webapp" + url).toPath());
+            response200Header(dos, responseBody.length);
+            responseBody(dos, responseBody);
 
         } catch (IOException e) {
             log.error("IOException during request", e);
         }
     }
 
+    private void response302Header(DataOutputStream dos, String url) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Redirect \r\n");
+            dos.writeBytes("Location: " + url + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
     private int getContentLength(String line) {
-        String [] headerTokens = line.split(":");
+        String[] headerTokens = line.split(":");
         return Integer.parseInt(headerTokens[1].trim());
     }
 
